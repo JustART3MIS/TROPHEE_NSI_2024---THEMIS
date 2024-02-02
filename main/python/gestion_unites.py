@@ -36,6 +36,36 @@ cur = db.cursor()
 ##### DEFINITION DES FONCTIONS ######
 #####################################
 
+def voir_effectifs():
+    cur.execute("SELECT * FROM effectifs")
+    effectifs = cur.fetchall()
+
+    # Convertir les tuples en listes
+    for index in range(len(effectifs)):
+        print(effectifs[index])
+        nouvelle_liste = []
+
+        for contenu in effectifs[index]:
+            nouvelle_liste.append(contenu)
+        print(nouvelle_liste)
+
+        effectifs[index] = nouvelle_liste
+
+    print(effectifs)
+
+    # Récupération de tous les grades dans l'ordre dans lequel ils apparaissent
+    ordre_grades = []
+    for index_grade in range(len(effectifs)):
+        ordre_grades.append(effectifs[index_grade][3])
+
+    # Rajout du nom du grade en plus de son id
+    for ref_grade in range(len(ordre_grades)):
+        cur.execute(f"SELECT nom FROM grades WHERE rang = {ordre_grades[ref_grade]}")
+        grade = cur.fetchone()[0]
+        ref_grade[ordre_grades]
+        effectifs[ref_grade][3] = f"{a} ({grade})"
+
+    return effectifs
 
 def ajouter_unite():
     pass
@@ -55,3 +85,5 @@ def montee_grade(id_unite = None, nb_grades = 1, ):
 
 def retrogradation():
     pass
+
+print(voir_effectifs())
