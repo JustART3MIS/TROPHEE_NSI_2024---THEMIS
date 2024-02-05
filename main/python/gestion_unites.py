@@ -23,6 +23,7 @@
 #########################
 
 import sqlite3 as sql
+from tabulate import tabulate
 
 ############################################
 ###### CONNEXION A LA BASE DE DONNEES ######
@@ -42,16 +43,12 @@ def voir_effectifs():
 
     # Convertir les tuples en listes
     for index in range(len(effectifs)):
-        print(effectifs[index])
         nouvelle_liste = []
 
         for contenu in effectifs[index]:
             nouvelle_liste.append(contenu)
-        print(nouvelle_liste)
 
         effectifs[index] = nouvelle_liste
-
-    print(effectifs)
 
     # Récupération de tous les grades dans l'ordre dans lequel ils apparaissent
     ordre_grades = []
@@ -60,12 +57,19 @@ def voir_effectifs():
 
     # Rajout du nom du grade en plus de son id
     for ref_grade in range(len(ordre_grades)):
+        # Récupération des 
         cur.execute(f"SELECT nom FROM grades WHERE rang = {ordre_grades[ref_grade]}")
         grade = cur.fetchone()[0]
-        ref_grade[ordre_grades]
-        effectifs[ref_grade][3] = f"{a} ({grade})"
+        ordre_grades[ref_grade] = f"{ordre_grades[ref_grade]} ({grade})"
+        effectifs[ref_grade][3] = ordre_grades[ref_grade]
 
-    return effectifs
+
+    headers = ["ID", "Nom", "Prénom", "Grade", "Téléphone", "Email"]
+
+    ## Utilisez la fonction tabulate pour afficher le tableau avec les en-têtes
+    table = tabulate(effectifs, headers, tablefmt="pretty")
+
+    return table
 
 def ajouter_unite():
     pass
