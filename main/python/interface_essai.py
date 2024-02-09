@@ -1,88 +1,65 @@
-# import all methods and classes from the tkinter 
-from tkinter import *
+import tkinter as tk
+from tkinter import ttk
+from calendar import monthcalendar
 
-# import calendar module
-import calendar
+class PompiersEmploiDuTempsApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Emploi du Temps Pompiers")
 
-# Function for showing the calendar of the given year
-def showCal() :
+        self.current_month = 1
+        self.current_year = 2024
+        self.create_widgets()
 
-	# Create a GUI window
-	new_gui = Tk()
-	
-	# Set the background colour of GUI window
-	new_gui.config(background = "white")
+    def create_widgets(self):
+        # Création de l'étiquette du titre
+        self.label = tk.Label(self.root, text="Emploi du Temps Pompiers", font=('Helvetica', 16))
+        self.label.grid(row=0, column=0, columnspan=7)
 
-	# set the name of tkinter GUI window 
-	new_gui.title("CALENDAR")
+        # Création du tableau (Treeview) pour afficher l'emploi du temps
+        self.tree = ttk.Treeview(self.root, columns=('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'))
+        self.tree.grid(row=1, column=0, columnspan=7, padx=10, pady=10)
 
-	# Set the configuration of GUI window
-	new_gui.geometry("550x600")
+        # Configuration des en-têtes du tableau
+        self.tree.heading('#0', text='Semaine/Mois', anchor='w')
+        for day in ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'):
+            self.tree.heading(day, text=day)
 
-	# get method returns current text as string
-	fetch_year = int(year_field.get())
+        # Mise à jour du calendrier initial
+        self.update_calendar()
 
-	# calendar method of calendar module return
-	# the calendar of the given year .
-	cal_content = calendar.calendar(fetch_year)
+        # Bouton pour afficher par semaine
+        self.show_week_button = tk.Button(self.root, text="Afficher par Semaine", command=self.show_week)
+        self.show_week_button.grid(row=2, column=0, pady=10)
 
-	# Create a label for showing the content of the calendar
-	cal_year = Label(new_gui, text = cal_content, font = "Consolas 10 bold")
+        # Bouton pour afficher par mois
+        self.show_month_button = tk.Button(self.root, text="Afficher par Mois", command=self.show_month)
+        self.show_month_button.grid(row=2, column=1, pady=10)
 
-	# grid method is used for placing 
-	# the widgets at respective positions 
-	# in table like structure.
-	cal_year.grid(row = 5, column = 1, padx = 20)
-	
-	# start the GUI 
-	new_gui.mainloop()
+    def update_calendar(self):
+        # Suppression des anciennes données du tableau
+        self.tree.delete(*self.tree.get_children())
+        # Obtention des semaines du mois en cours
+        weeks = monthcalendar(self.current_year, self.current_month)
 
-	
-# Driver Code
-if __name__ == "__main__" :
+        # Ajout des données au tableau
+        for week_num, week in enumerate(weeks, start=1):
+            week_str = f"Semaine {week_num}"
+            values = [week_str] + [str(day) if day != 0 else '' for day in week]
+            self.tree.insert('', 'end', values=values)
 
-	# Create a GUI window
-	gui = Tk()
-	
-	# Set the background colour of GUI window
-	gui.config(background = "white")
+    def show_week(self):
+        # Changement des en-têtes pour afficher par semaine
+        self.tree["column"] = ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche')
+        self.update_calendar()
 
-	# set the name of tkinter GUI window 
-	gui.title("CALENDAR")
+    def show_month(self):
+        # Changement des en-têtes pour afficher par mois
+        self.tree["column"] = ('Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim')
+        self.update_calendar()
 
-	# Set the configuration of GUI window
-	gui.geometry("250x140")
-
-	# Create a CALENDAR : label with specified font and size
-	cal = Label(gui, text = "CALENDAR", bg = "dark gray",
-							font = ("times", 28, 'bold'))
-
-	# Create a Enter Year : label 
-	year = Label(gui, text = "Enter Year", bg = "light green")
-	
-	# Create a text entry box for filling or typing the information. 
-	year_field = Entry(gui)
-
-	# Create a Show Calendar Button and attached to showCal function
-	Show = Button(gui, text = "Show Calendar", fg = "Black",
-							bg = "Red", command = showCal)
-
-	# Create a Exit Button and attached to exit function
-	Exit = Button(gui, text = "Exit", fg = "Black", bg = "Red", command = exit)
-	
-	# grid method is used for placing 
-	# the widgets at respective positions 
-	# in table like structure.
-	cal.grid(row = 1, column = 1)
-
-	year.grid(row = 2, column = 1)
-
-	year_field.grid(row = 3, column = 1)
-
-	Show.grid(row = 4, column = 1)
-
-	Exit.grid(row = 6, column = 1)
-	
-	# start the GUI 
-	gui.mainloop()
-	
+# Initialisation de l'application
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = PompiersEmploiDuTempsApp(root)
+    root.mainloop()
