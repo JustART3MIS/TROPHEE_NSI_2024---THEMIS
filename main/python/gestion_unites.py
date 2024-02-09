@@ -32,6 +32,7 @@ db = sql.connect("main\data\databases\main_data.db")
 
 cur = db.cursor()
 
+
 #####################################
 ##### DEFINITION DES FONCTIONS ######
 #####################################
