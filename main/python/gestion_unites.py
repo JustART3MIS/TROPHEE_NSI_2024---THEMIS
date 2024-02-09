@@ -40,18 +40,14 @@ cur = db.cursor()
 def ajouter_unite():
     pass
 
-def modifier_unite():
+def modifier_unite(id_unite):
     pass
 
-def retirer_unite():
+def retirer_unite(id_unite):
     pass
 
-def montee_grade(id_unite = None, nb_grades = 1, ):
-    if id_unite != None:
-        pass
+def montee_grade(id_unite, nb_grades = 1):
+    pass
 
-    else:
-        pass
-
-def retrogradation():
+def retrogradation(id_unite, nb_grades = 1):
     pass
