@@ -24,6 +24,8 @@
 
 import sqlite3 as sql
 
+
+
 ############################################
 ###### CONNEXION A LA BASE DE DONNEES ######
 ############################################
@@ -31,6 +33,7 @@ import sqlite3 as sql
 db = sql.connect("main\data\databases\main_data.db")
 
 cur = db.cursor()
+
 
 
 #####################################
