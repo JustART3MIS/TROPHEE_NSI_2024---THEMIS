@@ -89,7 +89,6 @@ def voir_effectifs():
 
     return table
 
-<<<<<<< HEAD
 def ajouter_unite(nom:str, prenom:str, grade:int, telephone:int, mail:str):
     """
     Cree une nouvelle entree dans la table effectifs avec les infos fournies par
@@ -216,7 +215,7 @@ def classer_unites():
     """
     classement selon leurs disponibilités
     """
-=======
+
 def connexion(identifiant:str = None, mdp:str = None) -> bool:
     """
     Vérifie si l'utilisateur a rentré les bons identifiants lors de sa
@@ -263,7 +262,6 @@ def connexion(identifiant:str = None, mdp:str = None) -> bool:
 
 
 def ajouter_unite():
->>>>>>> 6a70f6f9a91c918be9f0e549851f35b191e77a0f
     pass
 
 def afficher_grades(grade):
@@ -272,9 +270,8 @@ def afficher_grades(grade):
     """
     pass
 
-<<<<<<< HEAD
 montee_grade(7, 2)
-=======
+
 def retirer_unite():
     pass
 
@@ -289,4 +286,3 @@ def retrogradation():
     pass
 
 print(voir_effectifs())
->>>>>>> f0cabad0cf89d96b8fa6e89b5573422de7b2d0ea
