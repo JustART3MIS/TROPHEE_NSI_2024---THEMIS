@@ -25,6 +25,8 @@
 import sqlite3 as sql
 from tabulate import tabulate
 
+
+
 ############################################
 ###### CONNEXION A LA BASE DE DONNEES ######
 ############################################
@@ -32,6 +34,22 @@ from tabulate import tabulate
 db = sql.connect("main\data\databases\main_data.db")
 
 cur = db.cursor()
+
+# Requête pour obtenir les noms de toutes les tables dans la base de données
+cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
+
+# Récupérer les résultats de la requête
+tables = cur.fetchall()
+
+# Afficher les noms des tables
+if tables:
+    print("Tables existantes dans la base de données :")
+    for table in tables:
+        print(table[0])
+    print("\n ------------ \n")
+else:
+    print("Aucune table trouvée dans la base de données.")
+
 
 #####################################
 ##### DEFINITION DES FONCTIONS ######
@@ -71,6 +89,134 @@ def voir_effectifs():
 
     return table
 
+<<<<<<< HEAD
+def ajouter_unite(nom:str, prenom:str, grade:int, telephone:int, mail:str):
+    """
+    Cree une nouvelle entree dans la table effectifs avec les infos fournies par
+    l'appel. L'id de l'unite sera le nombre des id des unites + 1.
+
+    Entrées :
+        nom(str): nom de l'unite
+        prenom(str): prenom de l'unite
+        grade(int): grade de l'unite
+        telephone(int): numero de telephone de l'unite
+        mail(str): e-mail de l'unite
+
+    Sortie : 
+        Aucune
+    """
+    # On ajoute l'unite dans la base de donnees avec les renseignements
+    cur.execute(f"INSERT INTO effectifs VALUES('{nom}', '{prenom}', '{grade}', '{telephone}', '{mail}')")
+
+    db.commit()# Applique les modifications effectuees au fichier main_data.db
+
+def modifier_unite(idUnite:int, nom:str = None, prenom:str = None, telephone:int = None, mail:str = None):
+    """
+    Modifie une ou plusieurs coordonnées d'une unite
+
+    Entrées :
+        idUnite(int): id de l'unite que l'on veut modifier
+        nom(str): nom de l'unite
+        prenom(str): prenom de l'unite
+        telephone(int): numero de telephone de l'unite
+        mail(str): adresse e-mail de l'unite
+
+    Sortie : 
+        Aucune
+    """
+    if nom is not None:
+        cur.execute(f"UPDATE effectifs SET nom = '{nom}' WHERE idUnité = '{idUnite}'")
+
+    if prenom is not None:
+        cur.execute(f"UPDATE effectifs SET prenom = '{prenom}' WHERE idUnité = '{idUnite}'")
+
+    if telephone is not None:
+        cur.execute(f"UPDATE effectifs SET telephone = '{telephone}' WHERE idUnité = '{idUnite}'")
+
+    if mail is not None:
+        cur.execute(f"UPDATE effectifs SET mail = '{mail}' WHERE idUnité = '{idUnite}'")
+
+    db.commit()
+    
+def retirer_unite(idUnite):
+    """
+    Supprime une unite de la base de donnees a partir de son id
+
+    Entrée :
+        idUnite(int): id de l'unite que l'ont veut retirer
+
+    Sortie : 
+        Aucune
+    """
+    cur.execute(f"DELETE FROM effectifs WHERE idUnité = '{idUnite}'")
+
+    db.commit()
+
+def montee_grade(idUnite, nb_grades = 1):
+    """
+    Passage d'une unite a un ou plusieurs grades superieurs
+
+    Entrées :
+        idUnite(int): id de l'unite dont on veut monter le grade
+        nb_grades(int): nombre entier superieur a 0 correspondant au nombre
+        de grades a augmenter 
+    
+    Sortie :
+        Aucune
+    """
+    # On recupere le grade de l'unite choisie dans une variable grade_actuel
+    cur.execute(f"SELECT grade FROM effectifs WHERE idUnité = '{idUnite}'")
+    grade_actuel = int(cur.fetchone()[0])
+
+    # On modifie le grade de l'unite
+    cur.execute(f"UPDATE effectifs SET grade = '{grade_actuel+nb_grades}' WHERE idUnité = '{idUnite}'")
+
+    db.commit()
+
+def retrogradation(idUnite, nb_grades = 1):
+    """
+    Retrogradation d'une unite d'un ou plusieurs grades
+
+    Entrées :
+        idUnite(int): id de l'unite dont on veut baisser le grade
+        nb_grades(int): nombre entier superieur a 0 correspondant au nombre
+        de grades a baisser
+    
+    Sortie :
+        Aucune
+    """
+    # On recupere le grade de l'unite choisie dans une variable grade_actuel
+    cur.execute(f"SELECT grade FROM effectifs WHERE idUnité = '{idUnite}'")
+    grade_actuel = int(cur.fetchone()[0])
+
+    # On modifie le grade de l'unite
+    cur.execute(f"UPDATE effectifs SET grade = '{grade_actuel-nb_grades}' WHERE idUnité = '{idUnite}'")
+
+    db.commit()
+
+
+    # On recupere le grade de l'unite choisie dans une variable grade_actuel
+    cur.execute(f"SELECT grade FROM effectifs WHERE idUnité = '{idUnite}'")
+    grade_actuel = cur.fetchone()[0]
+
+    # On recupere le rang de ce grade et on le réduit du nombre donne en entree
+    cur.execute(f"SELECT rang FROM grades WHERE nom = '{grade_actuel}'")
+    nouveau_rang = int(cur.fetchone()[0]) - nb_grades
+
+    # On recupere le nom du grade grace au rang recupere
+    cur.execute(f"SELECT nom FROM grades WHERE rang = '{nouveau_rang}'")
+    nouveau_grade = str(cur.fetchone()[0])
+
+    # On modifie le nom du grade de l'unite
+    cur.execute(f"UPDATE effectifs SET grade = '{nouveau_grade}' WHERE idUnité = '{idUnite}'")
+
+    db.commit()
+
+def classer_unites():
+    """
+    classement selon leurs disponibilités
+    """
+=======
 def connexion(identifiant:str = None, mdp:str = None) -> bool:
     """
     Vérifie si l'utilisateur a rentré les bons identifiants lors de sa
@@ -117,11 +263,18 @@ def connexion(identifiant:str = None, mdp:str = None) -> bool:
 
 
 def ajouter_unite():
+>>>>>>> 6a70f6f9a91c918be9f0e549851f35b191e77a0f
     pass
 
-def modifier_unite():
+def afficher_grades(grade):
+    """
+    afficher le nombre d'unites de ce grade ainsi qu'une liste de leurs noms
+    """
     pass
 
+<<<<<<< HEAD
+montee_grade(7, 2)
+=======
 def retirer_unite():
     pass
 
@@ -136,3 +289,4 @@ def retrogradation():
     pass
 
 print(voir_effectifs())
+>>>>>>> f0cabad0cf89d96b8fa6e89b5573422de7b2d0ea
