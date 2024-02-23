@@ -71,6 +71,51 @@ def voir_effectifs():
 
     return table
 
+def connexion(identifiant:str = None, mdp:str = None) -> bool:
+    """
+    Vérifie si l'utilisateur a rentré les bons identifiants lors de sa
+    connexion
+
+    Entrées :
+        identifiant : nom d'utilisateur rentré par l'utilisateur.
+        mdp : mot de passe rentré par l'utilisateur.
+
+    Sortie :
+        True si l'utilisateur a bien été authentifié, False sinon.
+    """
+    if identifiant != None and mdp != None:
+
+        # Selectionne le numero de reference du mot de passe lié a l'identifiant entré
+        # Selectionne None si ce n'est lié à aucun compte enregistré
+        if identifiant == "" and mdp == "":
+            #easter egg
+            return None
+        cur.execute(f"SELECT mdp_compte FROM effectifs WHERE id_compte = '{identifiant}'")
+        
+        try:
+            #recup le 1er resultat, unpack car (num,)
+            (numero_compte, *_) = cur.fetchall()[0]# Stocke le resultat de la selection dans une variable
+        except IndexError: # identifiant non trouvé
+            numero_compte = None
+
+
+        if numero_compte != None: # Si le compte existe
+
+            # Selectionne le mot de passe relié a l'identifiant entré
+            cur.execute(f"SELECT contenu FROM passwords WHERE id_compte = '{numero_compte}' ")
+            bon_mdp = cur.fetchone()[0] # Stocke le bon mot de passe dans une variable
+
+            if mdp == bon_mdp : # Si le mot de passe est le même que celui enregistré dans la base de données
+            # Renvoie True si le mot de passe entré par l'utilisateur correspond a celui enregistré dans la database
+                return True
+            #si connect avec mauvais mdp
+            return False
+        #si connect avec mauvais id
+        return False
+    # Si connect with optional arg, ne devrait jamais arrivé
+    return False
+
+
 def ajouter_unite():
     pass
 
