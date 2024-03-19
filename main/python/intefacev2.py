@@ -1,7 +1,5 @@
 import tkinter as tk
-import calendar
-import sqlite3
-import locale
+import calendar, datetime, sqlite3, locale
 
 # Set the locale to French
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
@@ -44,7 +42,14 @@ class CalendarApp:
         self.conn = sqlite3.connect("data\databases\main_data.db")
         self.cursor = self.conn.cursor()
 
+        # Création de la table 'affectations' si elle n'existe pas
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS affectations
+                                (date_garde TEXT, id_pompier INTEGER)''')
+
+        self.gardes_info = [None] * 31  # Initialisation de la liste des gardes avec 31 éléments
+
         self.update_calendar()
+
 
     def create_calendar(self):
         self.days_labels = []
@@ -61,6 +66,19 @@ class CalendarApp:
         next_button = tk.Button(self.root, text="Mois suivant", command=self.next_month)
         next_button.grid(row=2, column=5, columnspan=2, pady=10)
 
+    def save_info(self, day, id_pompier, popup):
+        # Récupérer les informations du pompier sélectionné depuis la base de données
+        self.cursor.execute(f"SELECT grades.nom, effectifs.nom, prenom FROM effectifs, grades WHERE effectifs.id_grade = grades.rang AND idUnite = {id_pompier}")
+        pompier_info = self.cursor.fetchone()
+
+        # Insérer les informations de garde dans la table 'affectations'
+        date_garde = f"{self.current_year.get()}-{self.current_month.get():02d}-{day:02d}"
+        self.cursor.execute("INSERT INTO affectations (date_garde, id_pompier) VALUES (?, ?)", (date_garde, id_pompier))
+        self.conn.commit()
+
+        self.days_labels[day-1].config(text=f"{day}\n{pompier_info[1]} {pompier_info[2]} - {pompier_info[0]}", bg="lightgreen")
+        popup.destroy()
+
     def update_calendar(self):
         month_name = calendar.month_name[self.current_month.get()].capitalize()
         self.month_label.config(text=f"{month_name} {self.current_year.get()}")
@@ -68,12 +86,37 @@ class CalendarApp:
         days_in_month = calendar.monthrange(self.current_year.get(), self.current_month.get())[1]
 
         for label in self.days_labels:
-            label.config(text="")
+            label.config(text="", bg="white")  # Réinitialiser la couleur de fond à blanc
+            label.unbind("<Button-1>")  # Unbind any previous event bindings
 
+        # Récupérer les dates de garde de ce mois
+        self.cursor.execute("SELECT date_garde, id_pompier FROM gardes WHERE strftime('%Y-%m', date_garde) = ?", (f"{self.current_year.get()}-{self.current_month.get():02d}",))
+        gardes = self.cursor.fetchall()
+    
         for i in range(1, days_in_month + 1):
             day_label = self.days_labels[i - 1]
             day_label.config(text=str(i))
+
+            # Vérifier si le jour est une date de garde et marquer dans le calendrier
+            for garde in gardes:
+                garde_date = datetime.datetime.strptime(garde[0], '%Y-%m-%d').date()  # Convertir la date de garde en objet datetime.date
+                if garde_date.day == i:
+                    day_label.config(bg="lightgreen")
+
+            # Rétablir les liens d'événement pour chaque case
             day_label.bind("<Button-1>", lambda event, day=i: self.show_popup(day))
+            
+            # Réinitialiser les couleurs de fond des cases et rétablir les informations de garde
+            for i in range(1, days_in_month + 1):
+                day_label = self.days_labels[i - 1]
+                day_label.config(text=str(i), bg="white")
+
+                # Rétablir les informations de garde pour ce jour
+                if self.gardes_info[i - 1] is not None:
+                    day_label.config(text=self.gardes_info[i - 1], bg="lightgreen")
+
+                # Rétablir les liens d'événement pour chaque case
+                day_label.bind("<Button-1>", lambda event, day=i: self.show_popup(day))
 
     def prev_month(self):
         self.current_month.set(self.current_month.get() - 1)
@@ -111,23 +154,11 @@ class CalendarApp:
         pompier_var = tk.StringVar(popup)
         pompier_var.set("Sélectionnez un pompier")  # Sélection par défaut
 
-        pompier_menu = tk.OptionMenu(popup, pompier_var, *[f"[{grade}] - {nom} {prenom} ({id_unite})" for grade, nom, prenom, id_unite in pompiers])
+        pompier_menu = tk.OptionMenu(popup, pompier_var, *[f"[{grade}] - {nom} {prenom} | {id_unite}" for grade, nom, prenom, id_unite in pompiers])
         pompier_menu.pack(pady=5)
 
-        save_button = tk.Button(popup, text="Enregistrer", command=lambda: self.save_info(day, pompier_var.get().split(' - ')[0], popup))
+        save_button = tk.Button(popup, text="Enregistrer", command=lambda: self.save_info(day, pompier_var.get().split("| ")[1], popup))
         save_button.pack(pady=5)
-
-    def save_info(self, day, id_pompier, popup):
-        # Récupérer les informations du pompier sélectionné depuis la base de données
-        self.cursor.execute(f"SELECT grades.nom, effectifs.nom, prenom FROM effectifs, grades WHERE effectifs.id_grade = grades.rang AND idUnite = {id_pompier}")
-        pompier_info = self.cursor.fetchone()
-
-        # Récupérer le nom du grade à partir de la table grades
-        self.cursor.execute(f"SELECT nom FROM grades WHERE rang={pompier_info[1]}" )
-        grade_info = self.cursor.fetchone()
-
-        self.days_labels[day-1].config(text=f"{day}\n{pompier_info[0]} - {grade_info[0]}", bg="lightgreen")
-        popup.destroy()
 
 
 root = tk.Tk()
