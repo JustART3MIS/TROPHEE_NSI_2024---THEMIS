@@ -81,7 +81,6 @@ def voir_effectifs():
         ordre_grades[ref_grade] = f"{ordre_grades[ref_grade]} ({grade})"
         effectifs[ref_grade][3] = ordre_grades[ref_grade]
 
-
     headers = ["ID", "Nom", "Prénom", "Grade", "Téléphone", "Email"]
 
     ## Utilisez la fonction tabulate pour afficher le tableau avec les en-têtes
@@ -95,11 +94,11 @@ def ajouter_unite(nom:str, prenom:str, grade:int, telephone:int, mail:str):
     l'appel. L'id de l'unite sera le nombre des id des unites + 1.
 
     Entrées :
-        nom(str): nom de l'unite
-        prenom(str): prenom de l'unite
-        grade(int): grade de l'unite
-        telephone(int): numero de telephone de l'unite
-        mail(str): e-mail de l'unite
+        nom (str): nom de l'unite
+        prenom (str): prenom de l'unite
+        grade (int): grade de l'unite
+        telephone (int): numero de telephone de l'unite
+        mail (str): e-mail de l'unite
 
     Sortie : 
         Aucune
