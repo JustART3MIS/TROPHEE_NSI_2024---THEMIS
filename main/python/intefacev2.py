@@ -76,47 +76,10 @@ class CalendarApp:
         self.cursor.execute("INSERT INTO affectations (date_garde, id_pompier) VALUES (?, ?)", (date_garde, id_pompier))
         self.conn.commit()
 
-        self.days_labels[day-1].config(text=f"{day}\n{pompier_info[1]} {pompier_info[2]} - {pompier_info[0]}", bg="lightgreen")
+        self.days_labels[day-1].config(text=f"{day}\n{pompier_info[1]} {pompier_info[2]}\n{pompier_info[0]}", bg="lightgreen")
         popup.destroy()
 
-    def update_calendar(self):
-        month_name = calendar.month_name[self.current_month.get()].capitalize()
-        self.month_label.config(text=f"{month_name} {self.current_year.get()}")
-
-        days_in_month = calendar.monthrange(self.current_year.get(), self.current_month.get())[1]
-
-        for label in self.days_labels:
-            label.config(text="", bg="white")  # Réinitialiser la couleur de fond à blanc
-            label.unbind("<Button-1>")  # Unbind any previous event bindings
-
-        # Récupérer les dates de garde de ce mois
-        self.cursor.execute("SELECT date_garde, id_pompier FROM gardes WHERE strftime('%Y-%m', date_garde) = ?", (f"{self.current_year.get()}-{self.current_month.get():02d}",))
-        gardes = self.cursor.fetchall()
     
-        for i in range(1, days_in_month + 1):
-            day_label = self.days_labels[i - 1]
-            day_label.config(text=str(i))
-
-            # Vérifier si le jour est une date de garde et marquer dans le calendrier
-            for garde in gardes:
-                garde_date = datetime.datetime.strptime(garde[0], '%Y-%m-%d').date()  # Convertir la date de garde en objet datetime.date
-                if garde_date.day == i:
-                    day_label.config(bg="lightgreen")
-
-            # Rétablir les liens d'événement pour chaque case
-            day_label.bind("<Button-1>", lambda event, day=i: self.show_popup(day))
-            
-            # Réinitialiser les couleurs de fond des cases et rétablir les informations de garde
-            for i in range(1, days_in_month + 1):
-                day_label = self.days_labels[i - 1]
-                day_label.config(text=str(i), bg="white")
-
-                # Rétablir les informations de garde pour ce jour
-                if self.gardes_info[i - 1] is not None:
-                    day_label.config(text=self.gardes_info[i - 1], bg="lightgreen")
-
-                # Rétablir les liens d'événement pour chaque case
-                day_label.bind("<Button-1>", lambda event, day=i: self.show_popup(day))
 
     def prev_month(self):
         self.current_month.set(self.current_month.get() - 1)
@@ -159,6 +122,45 @@ class CalendarApp:
 
         save_button = tk.Button(popup, text="Enregistrer", command=lambda: self.save_info(day, pompier_var.get().split("| ")[1], popup))
         save_button.pack(pady=5)
+    
+    def update_calendar(self):
+        month_name = calendar.month_name[self.current_month.get()].capitalize()
+        self.month_label.config(text=f"{month_name} {self.current_year.get()}")
+
+        days_in_month = calendar.monthrange(self.current_year.get(), self.current_month.get())[1]
+
+        for label in self.days_labels:
+            label.config(text="", bg="white")  # Réinitialiser la couleur de fond à blanc
+            label.unbind("<Button-1>")  # Unbind any previous event bindings
+
+        # Récupérer les dates de garde de ce mois
+        self.cursor.execute("SELECT date_garde, id_pompier FROM gardes WHERE strftime('%Y-%m', date_garde) = ?", (f"{self.current_year.get()}-{self.current_month.get():02d}",))
+        gardes = self.cursor.fetchall()
+    
+        for i in range(1, days_in_month + 1):
+            day_label = self.days_labels[i - 1]
+            day_label.config(text=str(i))
+
+            # Vérifier si le jour est une date de garde et marquer dans le calendrier
+            for garde in gardes:
+                garde_date = datetime.datetime.strptime(garde[0], '%Y-%m-%d').date()  # Convertir la date de garde en objet datetime.date
+                if garde_date.day == i:
+                    day_label.config(bg="lightgreen")
+
+            # Rétablir les liens d'événement pour chaque case
+            day_label.bind("<Button-1>", lambda event, day=i: self.show_popup(day))
+            
+            # Réinitialiser les couleurs de fond des cases et rétablir les informations de garde
+            for i in range(1, days_in_month + 1):
+                day_label = self.days_labels[i - 1]
+                day_label.config(text=str(i), bg="white")
+
+                # Rétablir les informations de garde pour ce jour
+                if self.gardes_info[i - 1] is not None:
+                    day_label.config(text=self.gardes_info[i - 1], bg="lightgreen")
+
+                # Rétablir les liens d'événement pour chaque case
+                day_label.bind("<Button-1>", lambda event, day=i: self.show_popup(day))
 
 
 root = tk.Tk()
